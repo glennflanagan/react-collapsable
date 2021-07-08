@@ -9,6 +9,9 @@ class Collapsible extends Component {
 
     this.timeout = undefined;
 
+    this.contentId = `collapsible-content-${Date.now()}`;
+    this.triggerId = props.triggerElementProps.id || `collapsible-trigger-${Date.now()}`;
+
     // Defaults the dropdown to be closed
     if (props.open) {
       this.state = {
@@ -227,6 +230,7 @@ class Collapsible extends Component {
         {...this.props.containerElementProps}
       >
         <TriggerElement
+          id={this.triggerId}
           className={triggerClassString.trim()}
           onClick={this.handleTriggerClick}
           style={this.props.triggerStyle && this.props.triggerStyle}
@@ -241,6 +245,10 @@ class Collapsible extends Component {
             }
           }}
           tabIndex={this.props.tabIndex && this.props.tabIndex}
+          aria-expanded={!this.state.isClosed}
+          aria-disabled={this.props.triggerDisabled}
+          aria-controls={this.contentId}
+          role="button" // Since our default TriggerElement is not a button
           {...this.props.triggerElementProps}
         >
           {trigger}
@@ -249,6 +257,7 @@ class Collapsible extends Component {
         {this.renderNonClickableTriggerElement()}
 
         <div
+          id={this.contentId}
           className={outerClassString.trim()}
           style={dropdownStyle}
           onTransitionEnd={this.handleTransitionEnd}
@@ -258,6 +267,8 @@ class Collapsible extends Component {
             this.state.isClosed &&
             !this.state.inTransition
           }
+          role="region"
+          aria-labelledby={this.triggerId}
         >
           <div className={innerClassString.trim()}>{children}</div>
         </div>
@@ -337,6 +348,7 @@ Collapsible.defaultProps = {
   onTriggerClosing: () => {},
   tabIndex: null,
   contentContainerTagName: 'div',
+  triggerElementProps: {}
 };
 
 export default Collapsible;
